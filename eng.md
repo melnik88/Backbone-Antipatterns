@@ -16,12 +16,12 @@ Firstly, if your app is using some sort of database as the backend (highly likel
 
 Secondly, building a single-page app is just plain hard, especially if your background is in building traditional request-response apps with frameworks like PHP or Rails. SPAs are all asynchronous and event-based, and objects can live for a long time. This is very different from the synchronous, short-lifecycle approach of old-school web apps.
 
-Finally, it’s worth noting that just because you’re using Backbone (or Angular, or many other Javascript MVC frameworks) you don’t have to commit to building a full single-page app. Perhaps you can just use it for those parts of your app where the UX demands it. For example, 37Signals implemented the new Basecamp calendar with Backbone, without making all of Basecamp a single-page app.
+Finally, it’s worth noting that just because you’re using Backbone (or Angular, or many other Javascript MVC frameworks) you don’t have to commit to building a full single-page app. Perhaps you can just use it for those parts of your app where the UX demands it. For example, 37Signals implemented the [new Basecamp calendar](https://basecamp.com/calendar) with Backbone, without making all of Basecamp a single-page app.
 
 Antipattern #2: Using Backbone When You Should Use Another Framework
 --------------------------------------------------------------------
 
-The Javascript MVC framework you choose for a project is one of the most important decisions you’ll make, and Backbone is by no means the best choice for all projects. For more information check out my prior post on why Backbone Is Not Enough for many Javascript-intensive applications.
+The Javascript MVC framework you choose for a project is one of the most important decisions you’ll make, and Backbone is by no means the best choice for all projects. For more information check out my prior post on why [Backbone Is Not Enough](http://blog.shinetech.com/2013/09/06/backbone-is-not-enough/) for many Javascript-intensive applications.
 
 Antipattern #3: No View Tests
 -----------------------------
@@ -30,7 +30,7 @@ Backbone Models are reasonably straightforward to unit test. Backbone Views can 
 
 In addition to the well-understood benefits of unit testing (i.e., code quality), writing unit tests for your views forces you to think about how your code is structured. Because it is so easy to set up interdependencies between views via global variables and undocumented properties, un-tested code will tend gravitate towards a state where there are no clearly defined units of code. This is a bad thing.
 
-For more information on testing Backbone Views, check out my previous post on Testing Backbone Views with QUnit and Sinon.
+For more information on testing Backbone Views, check out my previous post on [Testing Backbone Views with QUnit and Sinon](http://blog.shinetech.com/2013/06/27/testing-backbone-views-with-qunit-and-sinon/).
 
 Antipattern #4: No Memory Management
 ------------------------------------
@@ -39,7 +39,7 @@ A classic Backbone beginners mistake is to not think about memory management. As
 
 ‘How can this be?’, the novice ask, ‘my code is super tight and Javascript is supposed to be garbage-collected’. Well unfortunately there’s one source of memory leaks that Javascript can’t pick up: views that continue to listen to their models for events, even when those views are no longer being displayed. Views stay in memory because models still retain references to them, and this pool of ‘zombie views’ grows over time.
 
-Fortunately this is a well-understood problem, for which there are a variety of solutions. Whatever you do, an important first step is to use Backbone’s listenTo method when subscribing to events rather than using the ‘on/bind’ methods directly. At least that way, the subscriber can keep a list of what its listening to. However, it’s still up to you (or your view-management framework – we often use Backbone LayoutManager) to get your views to stop listening to events when it is no longer being used.
+Fortunately this is a well-understood problem, for which there are a variety of solutions. Whatever you do, an important first step is to use Backbone’s listenTo method when subscribing to events rather than using the ‘on/bind’ methods directly. At least that way, the subscriber can keep a list of what its listening to. However, it’s still up to you (or your view-management framework – we often use [Backbone LayoutManager](https://github.com/tbranyen/backbone.layoutmanager/wiki)) to get your views to stop listening to events when it is no longer being used.
 
 Antipattern #5: Data Attributes in the DOM
 ------------------------------------------
@@ -110,7 +110,7 @@ Secondly, often custom events are added under the pretence that it ‘decouples�
 
 In the case of view interaction, I personally have no issues at all with two views having references to each other – as long as those references are well-documented (see anti-pattern #7). This is simpler and easier to test.
 
-The most useful events are those that are well-defined, globally understood, and potentially of interest in more than just one or two special-cases. The existing Backbone built-in events (http://backbonejs.org/#Events-catalog) meet these criteria. They can take you a long way if you fully leverage them.
+The most useful events are those that are well-defined, globally understood, and potentially of interest in more than just one or two special-cases. The existing Backbone built-in events ([http://backbonejs.org/#Events-catalog]()) meet these criteria. They can take you a long way if you fully leverage them.
 
 For example, one strategy that maximises the use of Backbone’s built-in events is to coordinate changes between several views via the underlying models that are shared by those views. One view could trigger a change to a model, which makes an update to another model, and that change is then picked up by another view that is listening for change events.  For complex views, introducing a tailor-made view-model can also be handy, and also make testing easier. Neither of these strategies require the introduction of custom events in the first instance.
 
@@ -125,7 +125,7 @@ One way to do this is to override the parse and toJSON methods on your models an
 
 Before you know it, things are getting out of hand and you’ve found yourself writing a pseudo-object/relational mapper. This is something your should avoid at all costs – object/relational mapping is something that seems straightforward at first but is littered with nasty edge-cases.
 
-Fortunately, there are a number of Backbone frameworks out there that do this sort of stuff for you already. Backbone-Relational is probably the most heavyweight. It’s very powerful and includes an identity map, but – like traditional O/R mappers – you can easily shoot yourself in the foot if you don’t make yourself familiar with the subtleties of how it works. Backbone-Associations and Backbone-Nested are more lightweight and may be sufficient for your needs.
+Fortunately, there are a number of Backbone frameworks out there that do this sort of stuff for you already. [Backbone-Relational](http://backbonerelational.org/) is probably the most heavyweight. It’s very powerful and includes an identity map, but – like traditional O/R mappers – you can easily shoot yourself in the foot if you don’t make yourself familiar with the subtleties of how it works. [Backbone-Associations](http://dhruvaray.github.io/backbone-associations/) and [Backbone-Nested](https://github.com/blittle/backbone-nested-models) are more lightweight and may be sufficient for your needs.
 
 Whatever you do, make sure you check them out before you do it yourself.
 
