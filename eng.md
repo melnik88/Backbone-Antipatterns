@@ -110,7 +110,7 @@ Secondly, often custom events are added under the pretence that it ‘decouples�
 
 In the case of view interaction, I personally have no issues at all with two views having references to each other – as long as those references are well-documented (see anti-pattern #7). This is simpler and easier to test.
 
-The most useful events are those that are well-defined, globally understood, and potentially of interest in more than just one or two special-cases. The existing Backbone built-in events ([http://backbonejs.org/#Events-catalog]()) meet these criteria. They can take you a long way if you fully leverage them.
+The most useful events are those that are well-defined, globally understood, and potentially of interest in more than just one or two special-cases. The existing Backbone built-in events ([http://backbonejs.org/#Events-catalog](http://backbonejs.org/#Events-catalog)) meet these criteria. They can take you a long way if you fully leverage them.
 
 For example, one strategy that maximises the use of Backbone’s built-in events is to coordinate changes between several views via the underlying models that are shared by those views. One view could trigger a change to a model, which makes an update to another model, and that change is then picked up by another view that is listening for change events.  For complex views, introducing a tailor-made view-model can also be handy, and also make testing easier. Neither of these strategies require the introduction of custom events in the first instance.
 
