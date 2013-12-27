@@ -56,18 +56,99 @@ var People = Backbone.Collection.extend({
 });
 ```
 
+Now let’s get to the problematic part. Firstly, the template (assuming we’re using Underscore templates):
+
+```
+<script id="people" type="text/template">
+  Here is our list of people:
+  <ul>
+    <% people.each(function(person) { %>
+      <li class='person' data-id='<%= person.id %>'>
+        Hi, my name is <%= person.get('name') %>
+      </li>
+    <% }); %>
+  </ul>
+</script>
+```
+Things starting to look fishy? Now the view:
+
+```
+var PeopleView = Backbone.View.extend({
+  events: {
+    'click .person': '_personClicked'
+  },
+  render: function() {
+    var renderTemplate = _.template($('#people').text());
+    this.$el.html(renderTemplate({people: this.collection}));
+  },
+  _personClicked: function(e) {
+    var personId = $(e.currentTarget).data('id');
+    var person = this.collection.get(personId);
+    $(e.currentTarget).text(
+      'Nice to meet you, ' + person.get('name')
+    );
+  }
+});
+```
+
 What’s the problem with this? Well, inserting data into the DOM and then pulling it out again kind of runs against the grain of Backbone and tends to box you in as your UI gets more complex.
 
 Instead, we’d be better-off leveraging everything Backbone gives us for associating portions of our DOM with data. Given that there’s a one-to-one correspondence between each Person model and their <li> row in the DOM, we might as well capitalise on that by having a view that mediates between the two of them.
 
 Let’s change our people template to be:
 
+```
+<script id="people" type="text/template">
+    Here is our list of people:
+    <ul></ul>
+</script>
+```
 
 and create another template called dedicated to displaying a person:
 
+```
+<script id="person" type="text/template">
+  Hi, my name is <%= person.get('name') %>
+</script>
+```
+
 Then define a view for the Person model:
 
+```
+var PersonView = Backbone.View.extend({
+  tagName: 'li',
+  events: {
+    'click': '_clicked'
+  },
+  render: function() {
+    var renderTemplate = _.template($('#person').text());
+    this.$el.html(renderTemplate({person: this.model}));
+    return this;
+  },
+  _clicked: function() {
+    this.$el.text(
+      'Nice to meet you, ' + this.model.get('name')
+    );
+  }
+});
+```
+
 and have the PeopleView render this into place:
+
+```
+var PeopleView = Backbone.View.extend({
+  render: function() {
+    var renderTemplate = _.template($('#people').text());
+    this.$el.html(renderTemplate({people: this.collection}));
+ 
+    this.collection.each(function(person) {
+      this.$('ul').append(
+        new PersonView({model: person}).render().$el
+      );
+    }, this);
+  }
+});
+```
 
 No more data attributes, no more event targets. This also makes testing easier, as you can now unit test a PersonView in isolation.
 
@@ -95,11 +176,36 @@ In earlier versions of Backbone, this object would automatically be bound to thi
 
 Either way, the consequence is that if you didn’t write the code, you often only find out about an option when it got used deep within a class. For example:
 
+```
+  var MyView = Backbone.View.extend({
+  initialize: function(options) {
+    this._options = options;
+  },
+  // … lots more code
+  doStuff: function() {
+    // ... do a bunch of stuff
+      this._options.obscureBackdoor.doSomethingCrucial();
+    // … do a bunch more stuff
+  }
+  // ... do more stuff
+});
+```
+
 Nobody will know that the view has a dependency on an obscure backdoor until they find the options reference deep within the code.
 
 This is unfortunate because each option object provided to a view is effectively a coupling between the view and that object. Put differently, the options that a view takes constitute part of the public interface of that view.
 
 Consequently, I highly recommend that all options that a model or view uses be documented somewhere in the class or initializer declaration (if there is one). It can look as simple as this:
+
+```
+/**
+ * options: 
+ * - obscureBackdoor: a now slightly-less obscure backdoor
+ */
+var MyView = Backbone.View.extend({
+  ...
+});
+```
 
 
 If you’re feeling particularly diligent, you can document which options are mandatory and which aren’t actually required. Or you can even check for the presence of mandatory options in the initialize() method of your object. Either way, if you don’t document options, there’s a good chance you’re going to end up with spaghetti code that’s full of hidden backdoors.
@@ -145,22 +251,63 @@ When rendering templates, remember that by default Backbone creates an empty div
 
 Here’s an example. Consider a templates like this:
 
+```
+<script type="text/template" id="section">
+  <section class='myClass'>
+    This is a section
+  </section>
+</script>
+```
+
+With a view like this:
+
+```
+var View = Backbone.View.extend({
+  render: function() {
+    this.$el.html(_.template($('#section').text())());
+  }
+});
+```
 
 So when you render the view, it looks like this:
 
+```
+<div>
+  <section class="myClass">
+    This is a section
+  </section>
+</div>
+```
 
 Those redundant divs really add up as your DOM gets more complex.
 
 The thing is that Backbone lets you specify details about the root element of a view, including what the element type should be. So instead, you could do this for the template:
 
-
+```
+<script type="text/template" id="section">
+    This is a section
+</script>
+```
 
 And provide more details about the root element in the view:
 
-
+```
+var View = Backbone.View.extend({
+  tagName: 'section',
+  className: 'myClass',
+  render: function() {
+    this.$el.html(_.template($('#section').text())());
+  }
+});
+```
 
 When rendered, the view will look like this:
 
+```
+<section class="myClass">
+  This is a section
+</section>
+```
 
 Much better. I used to not really understand why they’re called ‘Views’ rather than ‘Controllers’, but now I think I understand. I consider it a code smell if I see a template with a single root element. Use everything that Backbone gives you, and don’t balk at putting a little bit of view-related stuff in your View objects – that’s why they’re called ‘Views’, after all.
 
