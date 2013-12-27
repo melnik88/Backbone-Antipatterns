@@ -48,11 +48,13 @@ The next anti-pattern is probably the most common thing I see those new to Backb
 
 Say that we want to display a list of people, and respond when an item in the list is clicked. The models will look something like this:
 
+```
 var Person = Backbone.Model.extend();
  
 var People = Backbone.Collection.extend({
   model: Person
 });
+```
 
 What’s the problem with this? Well, inserting data into the DOM and then pulling it out again kind of runs against the grain of Backbone and tends to box you in as your UI gets more complex.
 
