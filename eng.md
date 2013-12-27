@@ -1,10 +1,13 @@
+Backbone Antipatterns
+=====================
+
 Backbone.js deserves a lot of credit for bringing MVC to mainstream client-side Javascript development. That said, many beginners ask what the ‘right way’ of doing something with Backbone is. The bad news is that there’s not necessarily a ‘right way’ – it all depends on the problem you are trying to solve. The good news is that there are definitely some ‘wrong ways’ that you should avoid on your way to finding the right solution for your particular problem.
 
 In this post I’ll cover some of these anti-patterns, as well as some general advice for the new starter. I’ve ordered the anti-patterns roughly by significance from the major to the more trivial. Don’t be too upset if you’ve done something on this list – I’ve made most of these mistakes myself ;)
 
 
 Antipattern #1: Building a single page app when you don’t need to
-
+-----------------------------------------------------------------
 This first one doesn’t really pertain to Backbone specifically, but it’s worth mentioning up-front: If you’ve decided to build a single-page app, make sure you’ve got a pretty good reason to do so.
 
 At first glance, the concept can seem appealing: instead of having to assemble fragments of HTML and Javascript on the server-side, just define a JSON API and do everything on the client-side with Javascript. However, there’s a couple of things you need to be wary of.
@@ -16,10 +19,12 @@ Secondly, building a single-page app is just plain hard, especially if your back
 Finally, it’s worth noting that just because you’re using Backbone (or Angular, or many other Javascript MVC frameworks) you don’t have to commit to building a full single-page app. Perhaps you can just use it for those parts of your app where the UX demands it. For example, 37Signals implemented the new Basecamp calendar with Backbone, without making all of Basecamp a single-page app.
 
 Antipattern #2: Using Backbone When You Should Use Another Framework
+--------------------------------------------------------------------
 
 The Javascript MVC framework you choose for a project is one of the most important decisions you’ll make, and Backbone is by no means the best choice for all projects. For more information check out my prior post on why Backbone Is Not Enough for many Javascript-intensive applications.
 
 Antipattern #3: No View Tests
+-----------------------------
 
 Backbone Models are reasonably straightforward to unit test. Backbone Views can be a little more tricky – but this doesn’t mean you shouldn’t do it.
 
@@ -28,6 +33,7 @@ In addition to the well-understood benefits of unit testing (i.e., code quality)
 For more information on testing Backbone Views, check out my previous post on Testing Backbone Views with QUnit and Sinon.
 
 Antipattern #4: No Memory Management
+------------------------------------
 
 A classic Backbone beginners mistake is to not think about memory management. As a consequence, in no time at all an app can be leaking memory like a sieve and triggering a blizzard of events whenever anything happens.
 
@@ -36,6 +42,7 @@ A classic Backbone beginners mistake is to not think about memory management. As
 Fortunately this is a well-understood problem, for which there are a variety of solutions. Whatever you do, an important first step is to use Backbone’s listenTo method when subscribing to events rather than using the ‘on/bind’ methods directly. At least that way, the subscriber can keep a list of what its listening to. However, it’s still up to you (or your view-management framework – we often use Backbone LayoutManager) to get your views to stop listening to events when it is no longer being used.
 
 Antipattern #5: Data Attributes in the DOM
+------------------------------------------
 
 The next anti-pattern is probably the most common thing I see those new to Backbone do – particularly if they’re coming from a jQuery background. It’s probably best demonstrated with an example.
 
@@ -60,6 +67,7 @@ No more data attributes, no more event targets. This also makes testing easier, 
 Put bluntly, don’t be shy about having lots of views. To be honest, it’s very rare for me to use iterators in templates, unless I’m rendering purely read-only data. I consider data attributes to be a code smell that will cause problems down the track.
 
 Antipattern #6: Rendering Templates Asynchronously
+--------------------------------------------------
 
 Frameworks like Backbone.LayoutManager make it easy to load templates asynchronously. However, it’s easy to underestimate how much asynchronicity complicates both your code and your tests – it should be avoided unless absolutely necessary. And a lot of the time, asynchronous template loading is unnecessary.
 
@@ -72,6 +80,7 @@ So this eliminates the only rationale for loading templates asynchronously.  So 
 If you don’t want to compile all your code into a single artefact, you can still break it into chunks and load those separately. However, each chunk should comprise both the code _and_ compiled templates relevant to a section of your app. Loading templates as they are needed is probably too fine-grained an optimisation and will make your app excessively chatty, not to mention harder to code.
 
 Antipattern #7: Undocumented Options
+------------------------------------
 
 Backbone Views can be initialized with an ‘options’ object, which can contain just about anything. The options object is extremely handy, because it means you can pass anything into a view via options. However, it’s also very easy to abuse, because options don’t have to be declared anywhere (for example, as arguments to the initialize() method).
 
@@ -89,6 +98,7 @@ Consequently, I highly recommend that all options that a model or view uses be d
 If you’re feeling particularly diligent, you can document which options are mandatory and which aren’t actually required. Or you can even check for the presence of mandatory options in the initialize() method of your object. Either way, if you don’t document options, there’s a good chance you’re going to end up with spaghetti code that’s full of hidden backdoors.
 
 Antipattern #8: Premature Use of Custom Events
+----------------------------------------------
 
 It’s common for new starters to Backbone to get excited about the fact that just about everything can emit custom events. Consequently, they start to add their own custom events.
 
@@ -107,6 +117,7 @@ For example, one strategy that maximises the use of Backbone’s built-in events
 The only place I’ve found custom events to be useful is in views that you want to reuse through your apps – for example, UI components like tabs or accordions. Custom events are the more flexible way for people to detect what a component is doing so that they can customise its behaviour for a particular scenario. Just make sure that these custom events are well-documented!
 
 Antipattern #9: Building a Relationship Mapper
+----------------------------------------------
 
 On non-trivial apps it’s not uncommon to want to deserialize nested JSON data structures from your server into a tree of Backbone models and collections, then potentially re-serialize that tree (or portions of it) for display in templates or for sending back to the server.
 
@@ -119,6 +130,7 @@ Fortunately, there are a number of Backbone frameworks out there that do this so
 Whatever you do, make sure you check them out before you do it yourself.
 
 Antipattern #10: Redundant Divs
+-------------------------------
 
 This is a minor one, and opinions can differ on it. However, I think it’s worth mentioning because a lot people don’t even realise it happens.
 
@@ -146,6 +158,7 @@ When rendered, the view will look like this:
 Much better. I used to not really understand why they’re called ‘Views’ rather than ‘Controllers’, but now I think I understand. I consider it a code smell if I see a template with a single root element. Use everything that Backbone gives you, and don’t balk at putting a little bit of view-related stuff in your View objects – that’s why they’re called ‘Views’, after all.
 
 Some Final Advice
+-----------------
 
 That sums up my top ten Backbone anti-patterns, ranging from the fundamental to the finicky. However, I appreciate that being told what not to do still leaves a very large set of possible things you could do.
 
