@@ -70,6 +70,7 @@ Now let’s get to the problematic part. Firstly, the template (assuming we’re
   </ul>
 </script>
 ```
+
 Things starting to look fishy? Now the view:
 
 ```
